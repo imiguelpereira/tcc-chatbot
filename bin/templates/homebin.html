@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+Homepage
+{% endblock %}
+
+{% block head %}
+<style>
+    #id_pergunta{
+        width:40vw;
+        height:5vh;
+        margin-top:62vh;
+        padding: 5px;
+        border-radius:3px;
+        font-size: 1vw;
+        padding-left:1vw ;
+        background-image: url("https://cdn-icons-png.flaticon.com/128/724/724954.png");
+        background-repeat: no-repeat;
+        background-position: right;
+        background-color: white;
+        border-right-width: 1vw;
+        border-color: white;
+        background-size: 1.3em;
+    }
+    #resposta-container{
+        width: 40vw;
+        max-height: 50vh;
+        font-size: 1vw;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <body style = "background-color:red;">
+
+        <nav class = "fundoTop ">
+
+            <div style = " margin-left: 25vw; margin-top: -5vh;">
+
+                <div class = " containerBin " style = " width: 20vw; height:75vh; background-color: white;border-radius: 2vh 0px 0px 2vh; margin-left: -10vw">
+                    <img src="{% static 'images/logo_ctc.png' %}" style = " width: 4.5vw; height: 9.4vh; margin-top: 0.5vw; margin-left: 8vw;position:absolute;"/>
+                    <a href="{% url 'bin:duvidasfrequentes' %}" style="font-size: 1vw;text-decoration: none;color: black; cursor: pointer; margin-left:7vw; position: absolute; margin-top: 20vh;text-align: center;"><img src="{% static 'images/dud.png' %}" style="width: 2vw;height: 4vh; margin-left: -4vw;"/><p style="margin-top: -3.5vh;margin-left: -1vw;">Dúvidas Frequentes</p></a>
+                    <a href="{% url 'bin:logout' %}" ><img src="{% static 'images/sair.png' %}" style="width:2vw; height:4vh;margin-left: 0.3vw;top: 69vh;position: relative;margin-left: 1vw;"><p style="margin-top: 66vh;margin-left: 3.5vw; font-weight:bold;font-family:Sans-Serif;font-size:1vw ;">Sair</p></a>
+               
+                </div>
+
+                    <div style=" margin-top: -75vh;border-radius: 0px 2vh 2vh 0px; width: 50vw;height: 75vh; background-color: black; margin-left:10vw;">
+
+                        <div name = "cyrcle"style =" width: 5vw; height:10vh; background-color: silver; border-radius: 100%; margin-top:2vw; margin-left: 4vw; position:absolute;">
+                            <img src="{% static 'images/bin.jpg' %}" style="margin-top: 0.55vw; display:inline-block;margin-left:0.5vw; width:4vw; height: 8vh; border-radius:100%;position:absolute;" />
+
+                            <div class="w-full flex justify-center">
+                                <div class="flex justify-center items-center w-11/12 md:w-10/12">
+                                    <form method="post" id="seu-form-id" class="w-6/12 justify-center">
+                                        {% csrf_token %}
+                                        <div>
+                                            {{ form }}
+
+                                        </div>
+                                
+                                        <!--
+                                        <input type="text" placeholder=" Digite sua dúvida..."style = "font-size: 1.2vw; width: 40vw; position:absolute; margin-top:28.5vw; height:4.6vh; border-radius:15vw  ;margin-left:5vw; padding:10px;"/>
+                                        -->
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+        </nav>
+
+        <!-- Adicione uma div para exibir a resposta -->
+    <div id="resposta-container" style="margin-left: 46vw; width:30vw; margin-top: -71vh; background-color: white; border-radius:5px; padding: 10px;" > Olá, Seja muito bem-vindo(a), meu nome é BIN estou aqui para solucionar as suas dúvidas relacionadas ao nosso maravilhoso colégio</div>
+
+    <script>
+    // Adicione um script para lidar com a submissão do formulário via AJAX
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('#seu-form-id');  // Adicione um ID ao seu formulário
+        const respostaContainer = document.querySelector('#resposta-container');
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;  // Adicione este elemento ao seu formulário
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            // Utilize AJAX para enviar a pergunta ao servidor
+            fetch('homepage', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrf_token,  // Certifique-se de fornecer o token CSRF
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Atualize a div com a resposta recebida
+                respostaContainer.innerHTML = `<p>${data.resposta}</p>`;
+            })
+            .catch(error => console.error('Erro ao enviar pergunta:', error));
+        });
+    });
+    </script>
+    </body>
+</html>
+{% endblock %}
